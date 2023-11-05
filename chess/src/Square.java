@@ -1,5 +1,8 @@
 import javax.swing.JPanel;
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 
 public class Square extends JPanel {
     private int row;
@@ -25,9 +28,20 @@ public class Square extends JPanel {
         this.isActive = var1;
     }
 
-    public void paintComponent(java.awt.Graphics var1) {
-        super.paintComponent(var1);
-        // Paint logic here
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        g.setFont(new Font("SansSerif", Font.BOLD, 20));
+
+        if (piece != null) {
+            FontMetrics metrics = g.getFontMetrics();
+            int x = (getWidth() - metrics.stringWidth(piece.getPiece())) / 2;
+            int y = ((getHeight() - metrics.getHeight()) / 2) + metrics.getAscent();
+
+            g.setColor(Color.RED);
+            g.drawString(piece.getPiece(), x, y);
+        }
     }
 
     public int getRow() {
@@ -40,6 +54,7 @@ public class Square extends JPanel {
 
     public void setPiece(Piece var1) {
         this.piece = var1;
+        repaint();
     }
 
     public Piece getPiece() {
@@ -48,9 +63,9 @@ public class Square extends JPanel {
 
     public void toggleHighlight() {
         if (getBackground().equals(originalColor)) {
-            setBackground(Color.YELLOW); // Highlight with yellow when clicked
+            setBackground(Color.YELLOW);
         } else {
-            setBackground(originalColor); // Reset to original color
+            setBackground(originalColor);
         }
     }
 }

@@ -13,7 +13,7 @@ public class Chess {
     public Chess() {
         this.whitePlayer = new Player(java.awt.Color.RED);
         this.blackPlayer = new Player(java.awt.Color.BLUE);
-        this.board = new Board(new MoveListener());
+        this.board = new Board(new MoveListener(this));
         this.currentPlayer = whitePlayer;
         init();
         initGUI();
@@ -75,6 +75,22 @@ public class Chess {
 
     public Player getCurrentPlayer() {
         return currentPlayer;
+    }
+
+    public void movePiece(Square start, Square end) {
+        Piece movedPiece = start.getPiece();
+        end.setPiece(movedPiece);
+        start.setPiece(null);
+        movedPiece.setSquare(end);
+        swapCurrentPlayer();
+    }
+
+    private void swapCurrentPlayer() {
+        if (currentPlayer == whitePlayer) {
+            currentPlayer = blackPlayer;
+        } else {
+            currentPlayer = whitePlayer;
+        }
     }
 
     // Additional methods from UML
