@@ -1,11 +1,30 @@
+/**
+ * Represents a Rook piece on a chessboard, extending the Piece class.
+ */
 public class Rook extends Piece {
+
+    /**
+     * Constructs a new Rook piece with the specified owner and name.
+     *
+     * @param owner The player who owns the piece.
+     * @param piece The name of the piece, typically a single character string.
+     */
     public Rook(Player owner, String piece) {
         super(owner, piece);
     }
 
+    /**
+     * Checks if moving the rook to the specified destination square is a valid move.
+     *
+     * @param destination The square to which the rook is being moved.
+     * @param board       The chessboard on which the move is being made.
+     * @return true if the move is valid, false otherwise.
+     */
     @Override
     public boolean validMove(Square destination, Board board) {
         Square start = this.getSquare();
+
+        // Rooks move either in a horizontal or vertical line.
         if (start.getRow() == destination.getRow() || start.getCol() == destination.getCol()) {
             if (start.getRow() == destination.getRow()) {
                 int fixedRow = start.getRow();
@@ -16,7 +35,8 @@ public class Rook extends Piece {
                         return false;
                     }
                 }
-            } else {
+            }
+            else {
                 int fixedCol = start.getCol();
                 int startRow = Math.min(start.getRow(), destination.getRow());
                 int endRow = Math.max(start.getRow(), destination.getRow());
@@ -26,11 +46,11 @@ public class Rook extends Piece {
                     }
                 }
             }
-            if (destination.getPiece() == null ||
-                    !destination.getPiece().getOwner().equals(this.getOwner())) {
-                return true;
-            }
+            // Move is valid if the destination square is either empty or contains an opponent's piece.
+            return destination.getPiece() == null ||
+                    !destination.getPiece().getOwner().equals(this.getOwner());
         }
+        // Move is not valid if it's not strictly horizontal or vertical.
         return false;
     }
 }

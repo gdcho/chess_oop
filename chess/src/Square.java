@@ -3,47 +3,93 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.BasicStroke;
 
+/**
+ * Represents a single square on a chessboard, which can hold a piece.
+ */
 public class Square extends JPanel {
+    // Constants for the default colors of the squares and the highlight color.
+    private static final Color LIGHT_COLOR = Color.WHITE;
+    private static final Color DARK_COLOR = Color.BLACK;
+    private static final Color HIGHLIGHT_COLOR = Color.RED;
+
+    // Position of the square on the board.
     private int row;
     private int col;
+    // The chess piece that is on this square, if any.
     private Piece piece;
+    // Whether this square is currently active (selected or possible move).
     private boolean isActive;
+    // The original color of the square (light or dark).
     private Color originalColor;
 
-    public Square(int var1, int var2) {
-        this.row = var1;
-        this.col = var2;
-
-        // Set the colour
-        if ((row + col) % 2 == 0) {
-            originalColor = Color.WHITE;
-        } else {
-            originalColor = Color.BLACK;
-        }
+    /**
+     * Constructs a square with specified row and column.
+     *
+     * @param row The row of the square on the chessboard.
+     * @param col The column of the square on the chessboard.
+     */
+    public Square(int row, int col) {
+        this.row = row;
+        this.col = col;
+        // Set the color of the square based on its position.
+        originalColor = (row + col) % 2 == 0 ? LIGHT_COLOR : DARK_COLOR;
         setBackground(originalColor);
     }
 
-    public void setActive(boolean var1) {
-        this.isActive = var1;
+    /**
+     * Sets the active state of the square and triggers a repaint.
+     *
+     * @param active Whether the square is active.
+     */
+    public void setActive(boolean active) {
+        this.isActive = active;
+        repaint();
     }
 
+    /**
+     * Custom painting for the square.
+     *
+     * @param g The Graphics object to paint on.
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        // Paint the background of the square.
+        g2d.setColor(originalColor);
+        g2d.fillRect(0, 0, getWidth(), getHeight());
 
-        g.setFont(new Font("SansSerif", Font.BOLD, 20));
-
+        // If there is a piece on the square, draw it.
         if (piece != null) {
-            FontMetrics metrics = g.getFontMetrics();
-            int x = (getWidth() - metrics.stringWidth(piece.getPiece())) / 2;
+            g2d.setFont(new Font("SansSerif", Font.BOLD, 20));
+            FontMetrics metrics = g2d.getFontMetrics();
+            int x = (getWidth() - metrics.stringWidth(piece.getImage())) / 2;
             int y = ((getHeight() - metrics.getHeight()) / 2) + metrics.getAscent();
+            int padding = 5;
+            int rectWidth = metrics.stringWidth(piece.getImage()) + padding * 2;
+            int rectHeight = metrics.getHeight() + padding;
+            g2d.setColor(Color.GREEN);
+            g2d.fillRect(x - padding, y - metrics.getAscent() - padding / 2, rectWidth, rectHeight);
+            // Set the color based on the piece owner.
+            g2d.setColor(piece.getOwner().isWhite() ? Color.WHITE : Color.BLACK);
+            g2d.drawString(piece.getImage(), x, y);
+        }
 
-            g.setColor(Color.RED);
-            g.drawString(piece.getPiece(), x, y);
+        // If the square is active, highlight it.
+        if (isActive) {
+            g2d.setColor(HIGHLIGHT_COLOR);
+            float thickness = 4.0f;
+            g2d.setStroke(new BasicStroke(thickness));
+            g2d.drawRect(1, 1, getWidth() - 3, getHeight() - 3);
         }
     }
 
+    // Getters and setters for the square's properties.
     public int getRow() {
         return row;
     }
@@ -52,8 +98,8 @@ public class Square extends JPanel {
         return col;
     }
 
-    public void setPiece(Piece var1) {
-        this.piece = var1;
+    public void setPiece(Piece piece) {
+        this.piece = piece;
         repaint();
     }
 
@@ -61,9 +107,21 @@ public class Square extends JPanel {
         return piece;
     }
 
+    /**
+     * Toggles the highlight status of the square and updates its background color.
+     */
     public void toggleHighlight() {
-        if (getBackground().equals(originalColor)) {
-            setBackground(Color.YELLOW);
+        isActive = !isActive;
+        updateBackgroundColor();
+        repaint();
+    }
+
+    /**
+     * Updates the background color of the square based on its active status.
+     */
+    private void updateBackgroundColor() {
+        if (isActive) {
+            setBackground(HIGHLIGHT_COLOR);
         } else {
             setBackground(originalColor);
         }
