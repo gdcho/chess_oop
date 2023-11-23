@@ -24,27 +24,45 @@ public class Pawn extends Piece {
      */
     @Override
     public boolean validMove(Square destination, Board board) {
+        // Get the current position of the pawn, including the level.
+        int startLevel = this.getSquare().getLevel();
         int startRow = this.getSquare().getRow();
         int startCol = this.getSquare().getCol();
+
+        // Get the position the pawn is trying to move to, including the level.
+        int destLevel = destination.getLevel();
         int destRow = destination.getRow();
         int destCol = destination.getCol();
-        int direction = this.getOwner().isWhite() ? -1 : 1;
 
-        // A pawn moves straight forward one square.
-        if (startCol == destCol && destRow == startRow + direction && destination.getPiece() == null) {
+        // Determine the direction of movement for the pawn based on its owner.
+        int direction = this.getOwner().isWhite() ? -1 : 1;
+        int levelDirection = destLevel - startLevel;
+
+        // Pawns can only move up or down one level at a time, and cannot 'skip' levels.
+        if (Math.abs(levelDirection) > 1) {
+            return false;
+        }
+
+        // A pawn moves straight forward one square on the same level.
+        if (levelDirection == 0 && startCol == destCol && destRow == startRow + direction && destination.getPiece() == null) {
             return true;
         }
 
-        // On its first move, a pawn can move two squares forward.
-        if (startCol == destCol && startRow == (this.getOwner().isWhite() ? 6 : 1) &&
-                destRow == startRow + 2 * direction) {
-            if (board.getSquareAt(startRow + direction, startCol).getPiece() == null && destination.getPiece() == null) {
-                return true;
-            }
+        // A pawn moves straight forward one square, advancing to the next level.
+        if (Math.abs(levelDirection) == 1 && startCol == destCol && destRow == startRow && destination.getPiece() == null) {
+            return true;
         }
 
-        // Pawns capture diagonally, one square forward.
-        if (Math.abs(startCol - destCol) == 1 && destRow == startRow + direction) {
+        // On its first move, a pawn can move two squares forward on the same level.
+        if (levelDirection == 0 && startCol == destCol && startRow == (this.getOwner().isWhite() ? 6 : 1) &&
+                destRow == startRow + 2 * direction && destination.getPiece() == null &&
+                board.getSquareAt(startLevel, startRow + direction, startCol).getPiece() == null) {
+            return true;
+        }
+
+        // Pawns capture diagonally, one square forward on the same level or advancing to the next level.
+        if (Math.abs(startCol - destCol) == 1 && ((destRow == startRow + direction && levelDirection == 0) ||
+                (destRow == startRow && Math.abs(levelDirection) == 1))) {
             if (destination.getPiece() != null && destination.getPiece().getOwner() != this.getOwner()) {
                 return true;
             }

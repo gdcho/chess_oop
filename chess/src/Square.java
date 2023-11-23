@@ -1,5 +1,6 @@
 import javax.swing.JPanel;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -17,8 +18,9 @@ public class Square extends JPanel {
     private static final Color HIGHLIGHT_COLOR = Color.RED;
 
     // Position of the square on the board.
-    private int row;
-    private int col;
+    private final int level;
+    private final int row;
+    private final int col;
     // The chess piece that is on this square, if any.
     private Piece piece;
     // Whether this square is currently active (selected or possible move).
@@ -32,12 +34,14 @@ public class Square extends JPanel {
      * @param row The row of the square on the chessboard.
      * @param col The column of the square on the chessboard.
      */
-    public Square(int row, int col) {
+    public Square(int level, int row, int col) {
+        this.level = level;
         this.row = row;
         this.col = col;
-        // Set the color of the square based on its position.
-        originalColor = (row + col) % 2 == 0 ? LIGHT_COLOR : DARK_COLOR;
+        originalColor = (row + col + level) % 2 == 0 ? LIGHT_COLOR : DARK_COLOR;
         setBackground(originalColor);
+        // Set fixed size in the constructor
+        setPreferredSize(new Dimension(60, 60)); // Adjust the size as needed
     }
 
     /**
@@ -57,39 +61,72 @@ public class Square extends JPanel {
      */
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g;
+        super.paintComponent(g); // Always call super.paintComponent to handle default painting behavior
+        Graphics2D g2d = (Graphics2D) g.create();
+
+        // Set rendering hints for quality
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        // Paint the background of the square.
-        g2d.setColor(originalColor);
+
+        // Paint the background of the square based on level to diagnose visibility issues
+        Color backgroundColor;
+        switch (level) {
+            case 0:
+                backgroundColor = originalColor;
+                break;
+            case 1:
+                backgroundColor = new Color(originalColor.getRed(), originalColor.getGreen(), originalColor.getBlue(), 192); // Slightly transparent
+                break;
+            case 2:
+                backgroundColor = new Color(originalColor.getRed(), originalColor.getGreen(), originalColor.getBlue(), 128); // More transparent
+                break;
+            default:
+                backgroundColor = originalColor; // Fallback for any other level
+                break;
+        }
+
+        // Fill the square with the background color
+        g2d.setColor(backgroundColor);
         g2d.fillRect(0, 0, getWidth(), getHeight());
 
-        // If there is a piece on the square, draw it.
+        // Draw the piece if it exists
         if (piece != null) {
-            g2d.setFont(new Font("SansSerif", Font.BOLD, 20));
-            FontMetrics metrics = g2d.getFontMetrics();
-            int x = (getWidth() - metrics.stringWidth(piece.getImage())) / 2;
-            int y = ((getHeight() - metrics.getHeight()) / 2) + metrics.getAscent();
-            int padding = 5;
-            int rectWidth = metrics.stringWidth(piece.getImage()) + padding * 2;
-            int rectHeight = metrics.getHeight() + padding;
-            g2d.setColor(Color.GREEN);
-            g2d.fillRect(x - padding, y - metrics.getAscent() - padding / 2, rectWidth, rectHeight);
-            // Set the color based on the piece owner.
-            g2d.setColor(piece.getOwner().isWhite() ? Color.WHITE : Color.BLACK);
-            g2d.drawString(piece.getImage(), x, y);
+            drawPiece(g2d);
         }
 
-        // If the square is active, highlight it.
+        // Highlight the square if it is active
         if (isActive) {
             g2d.setColor(HIGHLIGHT_COLOR);
-            float thickness = 4.0f;
-            g2d.setStroke(new BasicStroke(thickness));
+            g2d.setStroke(new BasicStroke(4.0f));
             g2d.drawRect(1, 1, getWidth() - 3, getHeight() - 3);
         }
+
+        g2d.dispose(); // Dispose of the graphics object to release system resources
     }
 
+    private void drawPiece(Graphics2D g2d) {
+        // Set the font for drawing the piece
+        g2d.setFont(new Font("SansSerif", Font.BOLD, 20));
+        FontMetrics metrics = g2d.getFontMetrics();
+        int x = (getWidth() - metrics.stringWidth(piece.getImage())) / 2;
+        int y = ((getHeight() - metrics.getHeight()) / 2) + metrics.getAscent();
+        int padding = 5;
+        int rectWidth = metrics.stringWidth(piece.getImage()) + padding * 2;
+        int rectHeight = metrics.getHeight() + padding;
+
+        // Draw the piece's background
+        g2d.setColor(Color.GREEN);
+        g2d.fillRect(x - padding, y - metrics.getAscent() - padding / 2, rectWidth, rectHeight);
+
+        // Draw the piece's text
+        g2d.setColor(piece.getOwner().isWhite() ? Color.WHITE : Color.BLACK);
+        g2d.drawString(piece.getImage(), x, y);
+    }
+
+
     // Getters and setters for the square's properties.
+    public int getLevel() {
+        return level;
+    }
     public int getRow() {
         return row;
     }
@@ -126,4 +163,5 @@ public class Square extends JPanel {
             setBackground(originalColor);
         }
     }
+
 }

@@ -1,6 +1,5 @@
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import java.awt.GridLayout;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * The main class for a chess game that sets up the game board,
@@ -35,19 +34,29 @@ public class Chess {
      * Initializes the Graphical User Interface for the chess game.
      */
     private void initGUI() {
-        frame = new JFrame("Chess OOP Game");
-        frame.setSize(500, 500);
+        frame = new JFrame("3D Chess OOP Game");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Set up the chess board layout.
-        JPanel boardPanel = new JPanel(new GridLayout(8, 8));
-        // Add all squares of the board to the panel.
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                boardPanel.add(board.getSquareAt(i, j));
+        JPanel boardsPanel = new JPanel(new GridLayout(1, 3)); // One row, three columns
+
+        // Create and add panels for each level
+        for (int level = 0; level < 3; level++) {
+            JPanel boardPanel = new JPanel(new GridLayout(8, 8));
+            boardPanel.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+
+            for (int row = 0; row < 8; row++) {
+                for (int col = 0; col < 8; col++) {
+                    Square square = board.getSquareAt(level, row, col);
+                    boardPanel.add(square);
+                }
             }
+            boardsPanel.add(boardPanel);
         }
-        frame.add(boardPanel);
+
+        frame.add(boardsPanel);
+        frame.pack();
+        frame.validate();
+        frame.repaint();
         frame.setVisible(true);
     }
 
@@ -62,29 +71,29 @@ public class Chess {
      * Places the pieces in their initial positions on the board.
      */
     private void initPieces() {
-        setPiece(0, 0, new Rook(blackPlayer, "R"));
-        setPiece(0, 1, new Bishop(blackPlayer, "B"));
-        setPiece(0, 2, new Knight(blackPlayer, "N"));
-        setPiece(0, 3, new King(blackPlayer, "K"));
-        setPiece(0, 4, new Queen(blackPlayer, "Q"));
-        setPiece(0, 5, new Knight(blackPlayer, "N"));
-        setPiece(0, 6, new Bishop(blackPlayer, "B"));
-        setPiece(0, 7, new Rook(blackPlayer, "R"));
+        setPiece(0, 0, 0, new Rook(blackPlayer, "R"));
+        setPiece(0,0, 1, new Bishop(blackPlayer, "B"));
+        setPiece(0,0, 2, new Knight(blackPlayer, "N"));
+        setPiece(0,0, 3, new King(blackPlayer, "K"));
+        setPiece(0,0, 4, new Queen(blackPlayer, "Q"));
+        setPiece(0,0, 5, new Knight(blackPlayer, "N"));
+        setPiece(0,0, 6, new Bishop(blackPlayer, "B"));
+        setPiece(0,0, 7, new Rook(blackPlayer, "R"));
         for (int col = 0; col < 8; col++) {
-            setPiece(1, col, new Pawn(blackPlayer, "P"));
+            setPiece(0,1, col, new Pawn(blackPlayer, "P"));
         }
 
         // Set pieces for black player
-        setPiece(7, 0, new Rook(whitePlayer, "R"));
-        setPiece(7, 1, new Bishop(whitePlayer, "B"));
-        setPiece(7, 2, new Knight(whitePlayer, "N"));
-        setPiece(7, 3, new King(whitePlayer, "K"));
-        setPiece(7, 4, new Queen(whitePlayer, "Q"));
-        setPiece(7, 5, new Knight(whitePlayer, "N"));
-        setPiece(7, 6, new Bishop(whitePlayer, "B"));
-        setPiece(7, 7, new Rook(whitePlayer, "R"));
+        setPiece(0,7, 0, new Rook(whitePlayer, "R"));
+        setPiece(0,7, 1, new Bishop(whitePlayer, "B"));
+        setPiece(0,7, 2, new Knight(whitePlayer, "N"));
+        setPiece(0,7, 3, new King(whitePlayer, "K"));
+        setPiece(0,7, 4, new Queen(whitePlayer, "Q"));
+        setPiece(0,7, 5, new Knight(whitePlayer, "N"));
+        setPiece(0,7, 6, new Bishop(whitePlayer, "B"));
+        setPiece(0,7, 7, new Rook(whitePlayer, "R"));
         for (int col = 0; col < 8; col++) {
-            setPiece(6, col, new Pawn(whitePlayer, "P"));
+            setPiece(0,6, col, new Pawn(whitePlayer, "P"));
         }
     }
 
@@ -95,11 +104,11 @@ public class Chess {
      * @param col   the column of the square
      * @param piece the piece to set on the square
      */
-    private void setPiece(int row, int col, Piece piece) {
+    private void setPiece(int level, int row, int col, Piece piece) {
         // Place the piece on the square at the given position.
-        board.getSquareAt(row, col).setPiece(piece);
+        board.getSquareAt(level,row, col).setPiece(piece);
         // Set the piece's current square to the new position.
-        piece.setSquare(board.getSquareAt(row, col));
+        piece.setSquare(board.getSquareAt(level, row, col));
     }
 
     /**

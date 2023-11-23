@@ -24,24 +24,27 @@ public class Knight extends Piece {
      */
     @Override
     public boolean validMove(Square destination, Board board) {
-        // Get the current position of the Knight.
+        // Get the current position of the Knight, including the level.
+        int startLevel = this.getSquare().getLevel();
         int startRow = this.getSquare().getRow();
         int startCol = this.getSquare().getCol();
 
-        // Get the position the Knight is trying to move to.
+        // Get the position the Knight is trying to move to, including the level.
+        int destLevel = destination.getLevel();
         int destRow = destination.getRow();
         int destCol = destination.getCol();
 
-        // Calculate the row and column differences between the start and destination squares.
+        // Calculate the differences in level, row, and column between the start and destination squares.
+        int levelDiff = Math.abs(destLevel - startLevel);
         int rowDiff = Math.abs(startRow - destRow);
         int colDiff = Math.abs(startCol - destCol);
 
-        // Check for "L" shaped move.
-        if ((rowDiff == 2 && colDiff == 1) || (rowDiff == 1 && colDiff == 2)) {
-            // Move is valid if the destination square is empty or contains an opponent's piece.
-            return (destination.getPiece() == null || destination.getPiece().getOwner() != this.getOwner());
-        }
+        // Check for "L" shaped move in 3D space.
+        boolean validLMove = (levelDiff == 0 && ((rowDiff == 2 && colDiff == 1) || (rowDiff == 1 && colDiff == 2))) ||
+                (levelDiff == 1 && ((rowDiff == 2 && colDiff == 0) || (rowDiff == 0 && colDiff == 2) ||
+                        (rowDiff == 1 && colDiff == 1)));
 
-        return false;
+        // Move is valid if it's an "L" move and the destination square is empty or contains an opponent's piece.
+        return validLMove && (destination.getPiece() == null || destination.getPiece().getOwner() != this.getOwner());
     }
 }

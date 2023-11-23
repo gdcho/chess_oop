@@ -3,7 +3,7 @@
  */
 public class Board {
     // The 2D array representing the squares on the board.
-    private Square[][] squares;
+    private Square[][][] squares;
 
     /**
      * Constructs a Board with a given MoveListener.
@@ -11,14 +11,15 @@ public class Board {
      * @param listener the MoveListener that should be notified when a move is made
      */
     public Board(MoveListener listener) {
-        // Initialize the 2D array to have 8 rows and 8 columns.
-        squares = new Square[8][8];
+        // Initialize a 3D array for 3 levels of 8x8 boards.
+        squares = new Square[3][8][8];
 
-        // Populate the array with Square objects and assign the listener to each.
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                squares[i][j] = new Square(i, j);
-                squares[i][j].addMouseListener(listener);
+        for (int level = 0; level < 3; level++) {
+            for (int row = 0; row < 8; row++) {
+                for (int col = 0; col < 8; col++) {
+                    squares[level][row][col] = new Square(level, row, col);
+                    squares[level][row][col].addMouseListener(listener);
+                }
             }
         }
     }
@@ -30,8 +31,11 @@ public class Board {
      * @param col the column index of the square
      * @return the Square at the specified location
      */
-    public Square getSquareAt(int row, int col) {
-        return squares[row][col];
+    public Square getSquareAt(int level, int row, int col) {
+        if (level >= 0 && level < 3 && row >= 0 && row < 8 && col >= 0 && col < 8) {
+            return squares[level][row][col];
+        }
+        return null;
     }
 
     /**
@@ -49,6 +53,6 @@ public class Board {
      * @return the number of columns
      */
     public int getNumberOfCols() {
-        return squares[0].length;
-    }
+        return squares[0][0].length; }
+
 }

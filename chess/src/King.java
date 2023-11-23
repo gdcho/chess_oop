@@ -23,22 +23,29 @@ public class King extends Piece {
      */
     @Override
     public boolean validMove(Square destination, Board board) {
-        // Get the current position of the King.
+        // Get the current position of the King, including the level.
+        int startLevel = this.getSquare().getLevel();
         int startRow = this.getSquare().getRow();
         int startCol = this.getSquare().getCol();
 
-        // Get the position the King is trying to move to.
+        // Get the position the King is trying to move to, including the level.
+        int destLevel = destination.getLevel();
         int destRow = destination.getRow();
         int destCol = destination.getCol();
 
-        // Calculate the row and column differences between the start and destination.
+        // Calculate the differences in level, row, and column between the start and destination.
+        int levelDiff = Math.abs(destLevel - startLevel);
         int rowDiff = Math.abs(startRow - destRow);
         int colDiff = Math.abs(startCol - destCol);
 
-        // Check if the move is either a single step move in any direction.
-        if ((rowDiff == 1 && colDiff == 1) || // Diagonal move
-                (rowDiff == 1 && colDiff == 0) || // Vertical move
-                (rowDiff == 0 && colDiff == 1)) { // Horizontal move
+        // Check if the move is a single step in any direction, including level changes.
+        if ((levelDiff == 1 && rowDiff == 0 && colDiff == 0) || // Up or down
+                (levelDiff == 0 && rowDiff == 1 && colDiff == 0) || // Vertical
+                (levelDiff == 0 && rowDiff == 0 && colDiff == 1) || // Horizontal
+                (levelDiff == 0 && rowDiff == 1 && colDiff == 1) || // Diagonal on the same level
+                (levelDiff == 1 && rowDiff == 1 && colDiff == 0) || // Diagonal across levels (vertical)
+                (levelDiff == 1 && rowDiff == 0 && colDiff == 1) || // Diagonal across levels (horizontal)
+                (levelDiff == 1 && rowDiff == 1 && colDiff == 1)) {  // Diagonal across levels (corner)
             // Move is valid if the destination square is empty or contains an opponent's piece.
             return (destination.getPiece() == null || destination.getPiece().getOwner() != this.getOwner());
         }
