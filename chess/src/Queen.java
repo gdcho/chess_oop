@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Represents a Queen piece on a chessboard, extending the Piece class.
  */
@@ -111,6 +114,72 @@ public class Queen extends Piece {
         }
 
         return true;
+    }
+
+    @Override
+    public List<Square> getPossibleMoves(Board board) {
+        List<Square> moves = new ArrayList<>();
+        int startLevel = getSquare().getLevel();
+        int startRow = getSquare().getRow();
+        int startCol = getSquare().getCol();
+
+        // Horizontal and vertical moves (like a Rook)
+        for (int i = 0; i < 8; i++) {
+            if (i != startCol) {
+                if (isPathClearStraight(startLevel, startRow, startCol, startLevel, startRow, i, board)) {
+                    moves.add(board.getSquareAt(startLevel, startRow, i));
+                }
+            }
+            if (i != startRow) {
+                if (isPathClearStraight(startLevel, startRow, startCol, startLevel, i, startCol, board)) {
+                    moves.add(board.getSquareAt(startLevel, i, startCol));
+                }
+            }
+            if (i != startLevel) {
+                if (isPathClearStraight(startLevel, startRow, startCol, i, startRow, startCol, board)) {
+                    moves.add(board.getSquareAt(i, startRow, startCol));
+                }
+            }
+        }
+
+        // Diagonal moves (like a Bishop)
+        for (int i = -7; i <= 7; i++) {
+            if (i != 0) {
+                int newRow = startRow + i;
+                int newCol = startCol + i;
+                int newLevel = startLevel + i;
+
+                // Diagonal in same level
+                if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
+                    if (isPathClearDiagonal(startLevel, startRow, startCol, startLevel, newRow, newCol, board)) {
+                        moves.add(board.getSquareAt(startLevel, newRow, newCol));
+                    }
+                }
+
+                // Diagonal across levels (vertical)
+                if (newRow >= 0 && newRow < 8 && newLevel >= 0 && newLevel < 3) {
+                    if (isPathClearDiagonal(startLevel, startRow, startCol, newLevel, newRow, startCol, board)) {
+                        moves.add(board.getSquareAt(newLevel, newRow, startCol));
+                    }
+                }
+
+                // Diagonal across levels (horizontal)
+                if (newCol >= 0 && newCol < 8 && newLevel >= 0 && newLevel < 3) {
+                    if (isPathClearDiagonal(startLevel, startRow, startCol, newLevel, startRow, newCol, board)) {
+                        moves.add(board.getSquareAt(newLevel, startRow, newCol));
+                    }
+                }
+
+                // Diagonal in 3D
+                if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8 && newLevel >= 0 && newLevel < 3) {
+                    if (isPathClearDiagonal(startLevel, startRow, startCol, newLevel, newRow, newCol, board)) {
+                        moves.add(board.getSquareAt(newLevel, newRow, newCol));
+                    }
+                }
+            }
+        }
+
+        return moves;
     }
 
 }

@@ -24,7 +24,7 @@ public class Square extends JPanel {
     // The chess piece that is on this square, if any.
     private Piece piece;
     // Whether this square is currently active (selected or possible move).
-    private boolean isActive;
+    public boolean isActive;
     // The original color of the square (light or dark).
     private Color originalColor;
 
@@ -51,7 +51,7 @@ public class Square extends JPanel {
      */
     public void setActive(boolean active) {
         this.isActive = active;
-        repaint();
+        repaint(); // Trigger a repaint to update the visual state of the square
     }
 
     /**
@@ -147,4 +147,7 @@ public class Square extends JPanel {
         }
     }
 
+    public boolean isActive() {
+        return isActive;
+    }
 }

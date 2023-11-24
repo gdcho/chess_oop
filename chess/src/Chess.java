@@ -42,7 +42,7 @@ public class Chess {
         // Create and add panels for each level
         for (int level = 0; level < 3; level++) {
             JPanel boardPanel = new JPanel(new GridLayout(8, 8));
-            boardPanel.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+            boardPanel.setBorder(BorderFactory.createLineBorder(Color.BLUE, 2));
 
             for (int row = 0; row < 8; row++) {
                 for (int col = 0; col < 8; col++) {

@@ -1,3 +1,6 @@
+import java.util.List;
+import java.util.ArrayList;
+
 /**
  * The Pawn class represents a pawn piece in a game of chess.
  * It extends the abstract Piece class and provides implementation
@@ -70,4 +73,64 @@ public class Pawn extends Piece {
 
         return false;
     }
+
+    @Override
+    public List<Square> getPossibleMoves(Board board) {
+        List<Square> moves = new ArrayList<>();
+        int startLevel = getSquare().getLevel();
+        int startRow = getSquare().getRow();
+        int startCol = getSquare().getCol();
+        int direction = this.getOwner().isWhite() ? -1 : 1;
+
+        // Forward move on the same level
+        if (isMovePossible(board, startLevel, startRow + direction, startCol)) {
+            moves.add(board.getSquareAt(startLevel, startRow + direction, startCol));
+        }
+
+        // Two-square forward move from the starting position
+        if ((this.getOwner().isWhite() && startRow == 6) || (!this.getOwner().isWhite() && startRow == 1)) {
+            if (isMovePossible(board, startLevel, startRow + direction, startCol) &&
+                    isMovePossible(board, startLevel, startRow + 2 * direction, startCol)) {
+                moves.add(board.getSquareAt(startLevel, startRow + 2 * direction, startCol));
+            }
+        }
+
+        // Diagonal captures on the same level
+        for (int newCol : new int[]{startCol - 1, startCol + 1}) {
+            if (newCol >= 0 && newCol < 8 && canCapture(board, startLevel, startRow + direction, newCol)) {
+                moves.add(board.getSquareAt(startLevel, startRow + direction, newCol));
+            }
+        }
+
+        // Forward move advancing to the next level
+        for (int newLevel : new int[]{startLevel - 1, startLevel + 1}) {
+            if (newLevel >= 0 && newLevel < 3 && isMovePossible(board, newLevel, startRow, startCol)) {
+                moves.add(board.getSquareAt(newLevel, startRow, startCol));
+            }
+        }
+
+        // Diagonal captures advancing to the next level
+        for (int newLevel : new int[]{startLevel - 1, startLevel + 1}) {
+            for (int newCol : new int[]{startCol - 1, startCol + 1}) {
+                if (newLevel >= 0 && newLevel < 3 && newCol >= 0 && newCol < 8 &&
+                        canCapture(board, newLevel, startRow, newCol)) {
+                    moves.add(board.getSquareAt(newLevel, startRow, newCol));
+                }
+            }
+        }
+
+        return moves;
+    }
+
+    private boolean isMovePossible(Board board, int level, int row, int col) {
+        // Check if the destination is within the board limits and the square is empty
+        return row >= 0 && row < 8 && col >= 0 && col < 8 && board.getSquareAt(level, row, col).getPiece() == null;
+    }
+
+    private boolean canCapture(Board board, int level, int row, int col) {
+        // Check if the destination is within the board limits and contains an opponent's piece
+        Piece piece = board.getSquareAt(level, row, col).getPiece();
+        return piece != null && piece.getOwner() != this.getOwner();
+    }
+
 }

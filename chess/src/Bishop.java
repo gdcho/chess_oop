@@ -1,3 +1,6 @@
+import java.util.List;
+import java.util.ArrayList;
+
 /**
  * Represents a Bishop chess piece, which moves diagonally on the board.
  */
@@ -42,24 +45,74 @@ public class Bishop extends Piece {
         // Calculate the differences in level, rows, and columns.
         int levelDiff = Math.abs(destLevel - startLevel);
         int rowDiff = Math.abs(destRow - startRow);
-        int colDiff = Math.abs(startCol - destCol);
+        int colDiff = Math.abs(destCol - startCol);
 
-        // Check if the move is along a 3D diagonal by comparing level, row, and column differences.
-        if (levelDiff == rowDiff && rowDiff == colDiff) {
-            int levelDirection = (destLevel - startLevel) / levelDiff;
-            int rowDirection = (destRow - startRow) / rowDiff;
-            int colDirection = (destCol - startCol) / colDiff;
-
-            for (int i = 1; i < levelDiff; i++) {
-                if (board.getSquareAt(startLevel + i * levelDirection, startRow + i * rowDirection, startCol + i * colDirection).getPiece() != null) {
-                    return false;
-                }
-            }
-
-            // The move is valid if the destination is empty or contains an opponent's piece.
-            return (destination.getPiece() == null || destination.getPiece().getOwner() != this.getOwner());
+        // Check if the move is a 2D diagonal on the same level or a 3D diagonal move.
+        if ((levelDiff == 0 && rowDiff == colDiff && rowDiff > 0) || (levelDiff == rowDiff && rowDiff == colDiff && levelDiff > 0)) {
+            return isPathClear(startLevel, startRow, startCol, destLevel, destRow, destCol, board);
         }
 
         return false;
     }
+
+    private boolean isPathClear(int startLevel, int startRow, int startCol, int destLevel, int destRow, int destCol, Board board) {
+        int levelDiff = Math.abs(destLevel - startLevel);
+        int rowDiff = Math.abs(destRow - startRow);
+        int colDiff = Math.abs(destCol - startCol);
+
+        int levelDirection = Integer.compare(destLevel, startLevel);
+        int rowDirection = Integer.compare(destRow, startRow);
+        int colDirection = Integer.compare(destCol, startCol);
+
+        // Use the maximum difference as the number of steps to check in the path
+        int steps = Math.max(Math.max(levelDiff, rowDiff), colDiff);
+
+        // Check each square along the path for a piece
+        for (int i = 1; i < steps; i++) {
+            int currentLevel = startLevel + i * levelDirection;
+            int currentRow = startRow + i * rowDirection;
+            int currentCol = startCol + i * colDirection;
+
+            // If any square along the path is not empty, the path is not clear
+            if (board.getSquareAt(currentLevel, currentRow, currentCol).getPiece() != null) {
+                return false;
+            }
+        }
+
+        // The path is clear if no pieces are found in all the squares along the path
+        return true;
+    }
+
+    @Override
+    public List<Square> getPossibleMoves(Board board) {
+        List<Square> moves = new ArrayList<>();
+        int startLevel = getSquare().getLevel();
+        int startRow = getSquare().getRow();
+        int startCol = getSquare().getCol();
+
+        // Check all diagonal moves on the same level and diagonally across levels
+        for (int i = -7; i <= 7; i++) {
+            if (i != 0) {
+                addDiagonalMoveIfValid(moves, board, startLevel, startRow, startCol, startLevel, startRow + i, startCol + i);
+                addDiagonalMoveIfValid(moves, board, startLevel, startRow, startCol, startLevel, startRow - i, startCol + i);
+                addDiagonalMoveIfValid(moves, board, startLevel, startRow, startCol, startLevel + i, startRow + i, startCol);
+                addDiagonalMoveIfValid(moves, board, startLevel, startRow, startCol, startLevel - i, startRow + i, startCol);
+                addDiagonalMoveIfValid(moves, board, startLevel, startRow, startCol, startLevel + i, startRow, startCol + i);
+                addDiagonalMoveIfValid(moves, board, startLevel, startRow, startCol, startLevel - i, startRow, startCol + i);
+                addDiagonalMoveIfValid(moves, board, startLevel, startRow, startCol, startLevel + i, startRow + i, startCol + i);
+                addDiagonalMoveIfValid(moves, board, startLevel, startRow, startCol, startLevel + i, startRow - i, startCol - i);
+            }
+        }
+
+        return moves;
+    }
+
+    private void addDiagonalMoveIfValid(List<Square> moves, Board board, int startLevel, int startRow, int startCol, int destLevel, int destRow, int destCol) {
+        if (destRow >= 0 && destRow < 8 && destCol >= 0 && destCol < 8 && destLevel >= 0 && destLevel < 3) {
+            if (isPathClear(startLevel, startRow, startCol, destLevel, destRow, destCol, board)) {
+                moves.add(board.getSquareAt(destLevel, destRow, destCol));
+            }
+        }
+    }
+
 }

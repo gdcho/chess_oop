@@ -1,3 +1,5 @@
+import java.util.List;
+
 /**
  * The abstract class Piece serves as a template for all the chess pieces.
  * It contains the common attributes and methods that all chess pieces share.
@@ -63,4 +65,7 @@ public abstract class Piece {
      * @return true if the move is valid, false otherwise.
      */
     public abstract boolean validMove(Square destination, Board board);
+
+    public abstract List<Square> getPossibleMoves(Board board);
+
 }

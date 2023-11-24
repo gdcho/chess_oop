@@ -1,7 +1,9 @@
+import javax.swing.JPanel;
+
 /**
  * Represents a game board consisting of a grid of squares.
  */
-public class Board {
+public class Board extends JPanel {
     // The 2D array representing the squares on the board.
     private Square[][][] squares;
 
@@ -54,5 +56,15 @@ public class Board {
      */
     public int getNumberOfCols() {
         return squares[0][0].length; }
+
+    public void refreshBoard() {
+        for (int level = 0; level < squares.length; level++) {
+            for (int row = 0; row < squares[level].length; row++) {
+                for (int col = 0; col < squares[level][row].length; col++) {
+                    squares[level][row][col].repaint();
+                }
+            }
+        }
+    }
 
 }

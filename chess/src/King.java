@@ -1,3 +1,6 @@
+import java.util.List;
+import java.util.ArrayList;
+
 /**
  * Represents the King piece in a game of chess.
  */
@@ -52,4 +55,39 @@ public class King extends Piece {
 
         return false;
     }
+
+    @Override
+    public List<Square> getPossibleMoves(Board board) {
+        List<Square> moves = new ArrayList<>();
+        int startLevel = getSquare().getLevel();
+        int startRow = getSquare().getRow();
+        int startCol = getSquare().getCol();
+
+        // Offsets for all possible moves of a King
+        int[][] movesOffset = {
+                {0, 1}, {0, -1}, {1, 0}, {-1, 0}, // Horizontal and vertical
+                {1, 1}, {1, -1}, {-1, 1}, {-1, -1}, // Diagonal on the same level
+                {0, 0, 1}, {0, 0, -1}, // Up and down a level
+                {1, 0, 1}, {1, 0, -1}, {-1, 0, 1}, {-1, 0, -1}, // Vertical and level
+                {0, 1, 1}, {0, 1, -1}, {0, -1, 1}, {0, -1, -1}, // Horizontal and level
+                {1, 1, 1}, {1, 1, -1}, {1, -1, 1}, {1, -1, -1}, // Diagonal and level
+                {-1, 1, 1}, {-1, 1, -1}, {-1, -1, 1}, {-1, -1, -1} // Diagonal and level
+        };
+
+        for (int[] move : movesOffset) {
+            int newRow = startRow + move[0];
+            int newCol = startCol + (move.length > 1 ? move[1] : 0);
+            int newLevel = startLevel + (move.length > 2 ? move[2] : 0);
+
+            if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8 && newLevel >= 0 && newLevel < 3) {
+                Square possibleMove = board.getSquareAt(newLevel, newRow, newCol);
+                if (possibleMove.getPiece() == null || possibleMove.getPiece().getOwner() != this.getOwner()) {
+                    moves.add(possibleMove);
+                }
+            }
+        }
+
+        return moves;
+    }
+
 }

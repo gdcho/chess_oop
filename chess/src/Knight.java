@@ -1,3 +1,6 @@
+import java.util.List;
+import java.util.ArrayList;
+
 /**
  * Represents the Knight piece in a game of chess.
  */
@@ -47,4 +50,34 @@ public class Knight extends Piece {
         // Move is valid if it's an "L" move and the destination square is empty or contains an opponent's piece.
         return validLMove && (destination.getPiece() == null || destination.getPiece().getOwner() != this.getOwner());
     }
+
+    @Override
+    public List<Square> getPossibleMoves(Board board) {
+        List<Square> moves = new ArrayList<>();
+        int startLevel = getSquare().getLevel();
+        int startRow = getSquare().getRow();
+        int startCol = getSquare().getCol();
+
+        // All possible "L" moves for a Knight
+        int[][] movesOffset = {
+                {-2, -1}, {-2, 1}, {-1, -2}, {-1, 2}, {1, -2}, {1, 2}, {2, -1}, {2, 1},
+                {-1, -1, -1}, {-1, -1, 1}, {-1, 1, -1}, {-1, 1, 1}, {1, -1, -1}, {1, -1, 1}, {1, 1, -1}, {1, 1, 1}
+        };
+
+        for (int[] move : movesOffset) {
+            int newRow = startRow + move[0];
+            int newCol = startCol + (move.length > 1 ? move[1] : 0);
+            int newLevel = startLevel + (move.length > 2 ? move[2] : 0);
+
+            if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8 && newLevel >= 0 && newLevel < 3) {
+                Square possibleMove = board.getSquareAt(newLevel, newRow, newCol);
+                if (possibleMove.getPiece() == null || possibleMove.getPiece().getOwner() != this.getOwner()) {
+                    moves.add(possibleMove);
+                }
+            }
+        }
+
+        return moves;
+    }
+
 }
