@@ -38,7 +38,7 @@ public class Square extends JPanel {
         this.level = level;
         this.row = row;
         this.col = col;
-        originalColor = (row + col + level) % 2 == 0 ? LIGHT_COLOR : DARK_COLOR;
+        originalColor = (row + col) % 2 == 0 ? DARK_COLOR : LIGHT_COLOR;
         setBackground(originalColor);
         // Set fixed size in the constructor
         setPreferredSize(new Dimension(60, 60)); // Adjust the size as needed
@@ -67,25 +67,8 @@ public class Square extends JPanel {
         // Set rendering hints for quality
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Paint the background of the square based on level to diagnose visibility issues
-        Color backgroundColor;
-        switch (level) {
-            case 0:
-                backgroundColor = originalColor;
-                break;
-            case 1:
-                backgroundColor = new Color(originalColor.getRed(), originalColor.getGreen(), originalColor.getBlue(), 192); // Slightly transparent
-                break;
-            case 2:
-                backgroundColor = new Color(originalColor.getRed(), originalColor.getGreen(), originalColor.getBlue(), 128); // More transparent
-                break;
-            default:
-                backgroundColor = originalColor; // Fallback for any other level
-                break;
-        }
-
-        // Fill the square with the background color
-        g2d.setColor(backgroundColor);
+        // Paint the background of the square. Remove the level-based opacity to ensure consistency across all levels.
+        g2d.setColor(originalColor);
         g2d.fillRect(0, 0, getWidth(), getHeight());
 
         // Draw the piece if it exists
