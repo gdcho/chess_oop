@@ -42,15 +42,26 @@ public class Knight extends Piece {
         int rowDiff = Math.abs(startRow - destRow);
         int colDiff = Math.abs(startCol - destCol);
 
-        // Check for "L" shaped move in 3D space.
+        Piece destPiece = destination.getPiece();
+        if (destPiece != null && destPiece.getOwner().equals(this.getOwner())) {
+            return false; // Can't take pieces of the same color
+        }
+
+        // Check for L shaped move in 3D space.
         boolean validLMove = (levelDiff == 0 && ((rowDiff == 2 && colDiff == 1) || (rowDiff == 1 && colDiff == 2))) ||
                 (levelDiff == 1 && ((rowDiff == 2 && colDiff == 0) || (rowDiff == 0 && colDiff == 2) ||
                         (rowDiff == 1 && colDiff == 1)));
 
-        // Move is valid if it's an "L" move and the destination square is empty or contains an opponent's piece.
+        // Move is valid if it's an L move and the destination square is empty or contains an opponent's piece.
         return validLMove && (destination.getPiece() == null || destination.getPiece().getOwner() != this.getOwner());
     }
 
+    /**
+     * Gets a list of all possible moves for the Knight piece.
+     *
+     * @param board the board on which the piece resides
+     * @return a list of all possible moves for the Knight piece
+     */
     @Override
     public List<Square> getPossibleMoves(Board board) {
         List<Square> moves = new ArrayList<>();
@@ -58,20 +69,20 @@ public class Knight extends Piece {
         int startRow = getSquare().getRow();
         int startCol = getSquare().getCol();
 
-        // All possible "L" moves for a Knight
-        int[][] movesOffset = {
-                {-2, -1}, {-2, 1}, {-1, -2}, {-1, 2}, {1, -2}, {1, 2}, {2, -1}, {2, 1},
-                {-1, -1, -1}, {-1, -1, 1}, {-1, 1, -1}, {-1, 1, 1}, {1, -1, -1}, {1, -1, 1}, {1, 1, -1}, {1, 1, 1}
+        // Moves that involve changing levels
+        int[][] levelChangeMovesOffset = {
+                {-1, -1, -1}, {-1, -1, 1}, {-1, 1, -1}, {-1, 1, 1},
+                {1, -1, -1}, {1, -1, 1}, {1, 1, -1}, {1, 1, 1}
         };
 
-        for (int[] move : movesOffset) {
+        for (int[] move : levelChangeMovesOffset) {
             int newRow = startRow + move[0];
-            int newCol = startCol + (move.length > 1 ? move[1] : 0);
-            int newLevel = startLevel + (move.length > 2 ? move[2] : 0);
+            int newCol = startCol + move[1];
+            int newLevel = startLevel + move[2];
 
             if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8 && newLevel >= 0 && newLevel < 3) {
                 Square possibleMove = board.getSquareAt(newLevel, newRow, newCol);
-                if (possibleMove.getPiece() == null || possibleMove.getPiece().getOwner() != this.getOwner()) {
+                if (validMove(possibleMove, board)) {
                     moves.add(possibleMove);
                 }
             }

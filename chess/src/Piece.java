@@ -66,6 +66,13 @@ public abstract class Piece {
      */
     public abstract boolean validMove(Square destination, Board board);
 
+    /**
+     * Abstract method to get a list of all possible moves for the piece.
+     * This method must be implemented by each specific piece type.
+     *
+     * @param board The board on which the piece is placed.
+     * @return A list of all possible moves for the piece.
+     */
     public abstract List<Square> getPossibleMoves(Board board);
 
 }

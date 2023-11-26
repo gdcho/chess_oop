@@ -41,7 +41,7 @@ public class Square extends JPanel {
         originalColor = (row + col) % 2 == 0 ? DARK_COLOR : LIGHT_COLOR;
         setBackground(originalColor);
         // Set fixed size in the constructor
-        setPreferredSize(new Dimension(60, 60)); // Adjust the size as needed
+        setPreferredSize(new Dimension(60, 60));
     }
 
     /**
@@ -51,7 +51,7 @@ public class Square extends JPanel {
      */
     public void setActive(boolean active) {
         this.isActive = active;
-        repaint(); // Trigger a repaint to update the visual state of the square
+        repaint(); // update the visual state of the square
     }
 
     /**
@@ -61,13 +61,13 @@ public class Square extends JPanel {
      */
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g); // Always call super.paintComponent to handle default painting behavior
+        super.paintComponent(g); // super.paintComponent to handle default painting behavior
         Graphics2D g2d = (Graphics2D) g.create();
 
         // Set rendering hints for quality
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Paint the background of the square. Remove the level-based opacity to ensure consistency across all levels.
+        // Paint the background of the square
         g2d.setColor(originalColor);
         g2d.fillRect(0, 0, getWidth(), getHeight());
 
@@ -83,9 +83,14 @@ public class Square extends JPanel {
             g2d.drawRect(1, 1, getWidth() - 3, getHeight() - 3);
         }
 
-        g2d.dispose(); // Dispose of the graphics object to release system resources
+        g2d.dispose();
     }
 
+    /**
+     * Draws the piece on the square.
+     *
+     * @param g2d the Graphics2D object to draw on
+     */
     private void drawPiece(Graphics2D g2d) {
         // Set the font for drawing the piece
         g2d.setFont(new Font("SansSerif", Font.BOLD, 20));
@@ -106,23 +111,48 @@ public class Square extends JPanel {
     }
 
 
-    // Getters and setters for the square's properties.
+    /**
+     * Returns the level of the square.
+     *
+     * @return the level of the square
+     */
     public int getLevel() {
         return level;
     }
+
+    /**
+     * Returns the row of the square.
+     *
+     * @return the row of the square
+     */
     public int getRow() {
         return row;
     }
 
+    /**
+     * Returns the column of the square.
+     *
+     * @return the column of the square
+     */
     public int getCol() {
         return col;
     }
 
+    /**
+     * Sets the piece on the square.
+     *
+     * @param piece the piece to set on the square
+     */
     public void setPiece(Piece piece) {
         this.piece = piece;
         repaint();
     }
 
+    /**
+     * Returns the piece on the square.
+     *
+     * @return the piece on the square
+     */
     public Piece getPiece() {
         return piece;
     }
@@ -147,6 +177,11 @@ public class Square extends JPanel {
         }
     }
 
+    /**
+     * Returns whether the square is active.
+     *
+     * @return true if the square is active, false otherwise
+     */
     public boolean isActive() {
         return isActive;
     }

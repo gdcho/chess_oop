@@ -32,22 +32,27 @@ public class Bishop extends Piece {
      */
     @Override
     public boolean validMove(Square destination, Board board) {
-        // Get the current position of the piece.
+        // Get the current position of the piece
         int startLevel = this.getSquare().getLevel();
         int startRow = this.getSquare().getRow();
         int startCol = this.getSquare().getCol();
 
-        // Get the position to move to.
+        // Get the position to move to
         int destLevel = destination.getLevel();
         int destRow = destination.getRow();
         int destCol = destination.getCol();
 
-        // Calculate the differences in level, rows, and columns.
+        // Calculate the differences in level, rows, and columns
         int levelDiff = Math.abs(destLevel - startLevel);
         int rowDiff = Math.abs(destRow - startRow);
         int colDiff = Math.abs(destCol - startCol);
 
-        // Check if the move is a 2D diagonal on the same level or a 3D diagonal move.
+        Piece destPiece = destination.getPiece();
+        if (destPiece != null && destPiece.getOwner().equals(this.getOwner())) {
+            return false; // Can't take pieces of the same color
+        }
+
+        // Check if the move is a 2D diagonal on the same level or a 3D diagonal move
         if ((levelDiff == 0 && rowDiff == colDiff && rowDiff > 0) || (levelDiff == rowDiff && rowDiff == colDiff && levelDiff > 0)) {
             return isPathClear(startLevel, startRow, startCol, destLevel, destRow, destCol, board);
         }
@@ -55,6 +60,17 @@ public class Bishop extends Piece {
         return false;
     }
 
+    /**
+     * Checks if the path is clear for a diagonal move.
+     * @param startLevel the starting level
+     * @param startRow the starting row
+     * @param startCol the starting column
+     * @param destLevel the destination level
+     * @param destRow the destination row
+     * @param destCol the destination column
+     * @param board the current board on which the piece resides
+     * @return true if no pieces are in the way, false otherwise.
+     */
     private boolean isPathClear(int startLevel, int startRow, int startCol, int destLevel, int destRow, int destCol, Board board) {
         int levelDiff = Math.abs(destLevel - startLevel);
         int rowDiff = Math.abs(destRow - startRow);
@@ -79,10 +95,15 @@ public class Bishop extends Piece {
             }
         }
 
-        // The path is clear if no pieces are found in all the squares along the path
         return true;
     }
 
+    /**
+     * Returns a list of all possible moves for a bishop in a 3D space.
+     *
+     * @param board the current 3D board on which the piece resides
+     * @return a list of all possible moves for a bishop in a 3D space
+     */
     @Override
     public List<Square> getPossibleMoves(Board board) {
         List<Square> moves = new ArrayList<>();
@@ -90,29 +111,41 @@ public class Bishop extends Piece {
         int startRow = getSquare().getRow();
         int startCol = getSquare().getCol();
 
-        // Check all diagonal moves on the same level and diagonally across levels
-        for (int i = -7; i <= 7; i++) {
-            if (i != 0) {
-                addDiagonalMoveIfValid(moves, board, startLevel, startRow, startCol, startLevel, startRow + i, startCol + i);
-                addDiagonalMoveIfValid(moves, board, startLevel, startRow, startCol, startLevel, startRow - i, startCol + i);
-                addDiagonalMoveIfValid(moves, board, startLevel, startRow, startCol, startLevel + i, startRow + i, startCol);
-                addDiagonalMoveIfValid(moves, board, startLevel, startRow, startCol, startLevel - i, startRow + i, startCol);
-                addDiagonalMoveIfValid(moves, board, startLevel, startRow, startCol, startLevel + i, startRow, startCol + i);
-                addDiagonalMoveIfValid(moves, board, startLevel, startRow, startCol, startLevel - i, startRow, startCol + i);
-                addDiagonalMoveIfValid(moves, board, startLevel, startRow, startCol, startLevel + i, startRow + i, startCol + i);
-                addDiagonalMoveIfValid(moves, board, startLevel, startRow, startCol, startLevel + i, startRow - i, startCol - i);
+        // Iterate through all possible diagonal moves
+        for (int levelOffset = -2; levelOffset <= 2; levelOffset++) {
+            for (int rowOffset = -7; rowOffset <= 7; rowOffset++) {
+                for (int colOffset = -7; colOffset <= 7; colOffset++) {
+                    if (Math.abs(levelOffset) == Math.abs(rowOffset) && Math.abs(rowOffset) == Math.abs(colOffset)) {
+                        int destLevel = startLevel + levelOffset;
+                        int destRow = startRow + rowOffset;
+                        int destCol = startCol + colOffset;
+
+                        if (isValidMove(destLevel, destRow, destCol, board)) {
+                            moves.add(board.getSquareAt(destLevel, destRow, destCol));
+                        }
+                    }
+                }
             }
         }
 
         return moves;
     }
 
-    private void addDiagonalMoveIfValid(List<Square> moves, Board board, int startLevel, int startRow, int startCol, int destLevel, int destRow, int destCol) {
-        if (destRow >= 0 && destRow < 8 && destCol >= 0 && destCol < 8 && destLevel >= 0 && destLevel < 3) {
-            if (isPathClear(startLevel, startRow, startCol, destLevel, destRow, destCol, board)) {
-                moves.add(board.getSquareAt(destLevel, destRow, destCol));
-            }
+    /**
+     * Checks if the move to the destination square is valid for a bishop in a 3D space.
+     *
+     * @param destLevel the destination level
+     * @param destRow the destination row
+     * @param destCol the destination column
+     * @param board the current 3D board on which the piece resides
+     * @return true if the move is valid, false otherwise
+     */
+    private boolean isValidMove(int destLevel, int destRow, int destCol, Board board) {
+        if (destLevel >= 0 && destLevel < 3 && destRow >= 0 && destRow < 8 && destCol >= 0 && destCol < 8) {
+            return isPathClear(this.getSquare().getLevel(), this.getSquare().getRow(), this.getSquare().getCol(),
+                    destLevel, destRow, destCol, board);
         }
+        return false;
     }
 
 }

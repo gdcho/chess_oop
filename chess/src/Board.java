@@ -29,6 +29,7 @@ public class Board extends JPanel {
     /**
      * Retrieves the square at the specified row and column.
      *
+     * @param level the level index of the square
      * @param row the row index of the square
      * @param col the column index of the square
      * @return the Square at the specified location
@@ -57,14 +58,15 @@ public class Board extends JPanel {
     public int getNumberOfCols() {
         return squares[0][0].length; }
 
-    public void refreshBoard() {
+    public void clearHighlights() {
         for (int level = 0; level < squares.length; level++) {
             for (int row = 0; row < squares[level].length; row++) {
                 for (int col = 0; col < squares[level][row].length; col++) {
-                    squares[level][row][col].repaint();
+                    squares[level][row][col].setActive(false);
                 }
             }
         }
+        repaint();
     }
 
 }

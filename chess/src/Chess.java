@@ -100,6 +100,7 @@ public class Chess {
     /**
      * Sets a piece on a square and associates the square with the piece.
      *
+     * @param level the level of the square
      * @param row   the row of the square
      * @param col   the column of the square
      * @param piece the piece to set on the square
@@ -136,17 +137,20 @@ public class Chess {
      * @param end   the ending square of the move
      */
     public void move(Square start, Square end) {
-        // Get the piece from the start square.
         Piece move = start.getPiece();
-        // Move the piece to the end square.
         end.setPiece(move);
-        // Clear the start square.
         start.setPiece(null);
         // Update the piece's position.
         move.setSquare(end);
-        // Change turns between players.
+
+        // Refresh the UI
+        start.repaint();
+        end.repaint();
+
         swapCurrentPlayer();
+        frame.repaint();
     }
+
 
     /**
      * Switches the current player from white to black, or black to white.

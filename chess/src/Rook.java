@@ -27,6 +27,11 @@ public class Rook extends Piece {
     public boolean validMove(Square destination, Board board) {
         Square start = this.getSquare();
 
+        Piece destPiece = destination.getPiece();
+        if (destPiece != null && destPiece.getOwner().equals(this.getOwner())) {
+            return false; // Can't take pieces of the same color
+        }
+
         // Check if the move is either horizontal, vertical, or across levels.
         if (start.getRow() == destination.getRow() && start.getCol() == destination.getCol()) {
             // Move across levels
@@ -44,6 +49,14 @@ public class Rook extends Piece {
         return false;
     }
 
+    /**
+     * Checks if the level path between two squares is clear for a rook to move.
+     *
+     * @param start       The starting square.
+     * @param destination The destination square.
+     * @param board       The board on which the move is being made.
+     * @return true if the path is clear, false otherwise.
+     */
     private boolean isPathClearAcrossLevels(Square start, Square destination, Board board) {
         int startLevel = start.getLevel();
         int destLevel = destination.getLevel();
@@ -58,6 +71,14 @@ public class Rook extends Piece {
         return true;
     }
 
+    /**
+     * Checks if the horizontal path between two squares is clear for a rook to move.
+     *
+     * @param start       The starting square.
+     * @param destination The destination square.
+     * @param board       The board on which the move is being made.
+     * @return true if the path is clear, false otherwise.
+     */
     private boolean isPathClearHorizontal(Square start, Square destination, Board board) {
         int startCol = Math.min(start.getCol(), destination.getCol());
         int endCol = Math.max(start.getCol(), destination.getCol());
@@ -71,6 +92,14 @@ public class Rook extends Piece {
         return true;
     }
 
+    /**
+     * Checks if the vertical path between two squares is clear for a rook to move.
+     *
+     * @param start       The starting square.
+     * @param destination The destination square.
+     * @param board       The board on which the move is being made.
+     * @return true if the path is clear, false otherwise.
+     */
     private boolean isPathClearVertical(Square start, Square destination, Board board) {
         int startRow = Math.min(start.getRow(), destination.getRow());
         int endRow = Math.max(start.getRow(), destination.getRow());
@@ -84,6 +113,12 @@ public class Rook extends Piece {
         return true;
     }
 
+    /**
+     * Returns a list of all possible moves for the rook piece.
+     *
+     * @param board the board on which the piece resides
+     * @return a list of all possible moves for the rook piece
+     */
     @Override
     public List<Square> getPossibleMoves(Board board) {
         List<Square> moves = new ArrayList<>();
@@ -91,62 +126,38 @@ public class Rook extends Piece {
         int startRow = getSquare().getRow();
         int startCol = getSquare().getCol();
 
-        // Check all squares in the same row
-        for (int col = 0; col < 8; col++) {
-            if (col != startCol && isPathClear(board, startLevel, startRow, startCol, startLevel, startRow, col)) {
-                moves.add(board.getSquareAt(startLevel, startRow, col));
-            }
-        }
-
-        // Check all squares in the same column
-        for (int row = 0; row < 8; row++) {
-            if (row != startRow && isPathClear(board, startLevel, startRow, startCol, startLevel, row, startCol)) {
-                moves.add(board.getSquareAt(startLevel, row, startCol));
-            }
-        }
-
-        // Check all squares in the same level
+        // Check for moves that change levels but keep the row and column constant
         for (int level = 0; level < 3; level++) {
-            if (level != startLevel && isPathClear(board, startLevel, startRow, startCol, level, startRow, startCol)) {
-                moves.add(board.getSquareAt(level, startRow, startCol));
+            if (level != startLevel) {
+                if (isPathClearAcrossLevels(board, startLevel, startRow, startCol, level, startRow, startCol)) {
+                    moves.add(board.getSquareAt(level, startRow, startCol));
+                }
             }
         }
 
         return moves;
     }
 
-    private boolean isPathClear(Board board, int startLevel, int startRow, int startCol, int endLevel, int endRow, int endCol) {
-        // Horizontal move
-        if (startRow == endRow && startLevel == endLevel) {
-            int minCol = Math.min(startCol, endCol);
-            int maxCol = Math.max(startCol, endCol);
-            for (int col = minCol + 1; col < maxCol; col++) {
-                if (board.getSquareAt(startLevel, startRow, col).getPiece() != null) {
-                    return false;
-                }
+    /**
+     * Checks if the path across all levels between two squares is clear for a rook to move.
+     *
+     * @param board       The board on which the move is being made.
+     * @param startLevel  The starting level.
+     * @param startRow    The starting row.
+     * @param startCol    The starting column.
+     * @param endLevel    The ending level.
+     * @param endRow      The ending row.
+     * @param endCol      The ending column.
+     * @return true if the path is clear, false otherwise.
+     */
+    private boolean isPathClearAcrossLevels(Board board, int startLevel, int startRow, int startCol, int endLevel, int endRow, int endCol) {
+        int minLevel = Math.min(startLevel, endLevel);
+        int maxLevel = Math.max(startLevel, endLevel);
+        for (int level = minLevel + 1; level < maxLevel; level++) {
+            if (board.getSquareAt(level, startRow, startCol).getPiece() != null) {
+                return false;
             }
         }
-        // Vertical move
-        else if (startCol == endCol && startLevel == endLevel) {
-            int minRow = Math.min(startRow, endRow);
-            int maxRow = Math.max(startRow, endRow);
-            for (int row = minRow + 1; row < maxRow; row++) {
-                if (board.getSquareAt(startLevel, row, startCol).getPiece() != null) {
-                    return false;
-                }
-            }
-        }
-        // Level move
-        else if (startRow == endRow && startCol == endCol) {
-            int minLevel = Math.min(startLevel, endLevel);
-            int maxLevel = Math.max(startLevel, endLevel);
-            for (int level = minLevel + 1; level < maxLevel; level++) {
-                if (board.getSquareAt(level, startRow, startCol).getPiece() != null) {
-                    return false;
-                }
-            }
-        }
-
         return true;
     }
 

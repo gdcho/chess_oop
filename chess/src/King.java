@@ -18,7 +18,6 @@ public class King extends Piece {
 
     /**
      * Checks if a move to a specified square is valid for the King piece.
-     * The King can move exactly one square horizontally, vertically, or diagonally.
      *
      * @param destination the square to move to
      * @param board       the board on which the move is to be made
@@ -41,6 +40,11 @@ public class King extends Piece {
         int rowDiff = Math.abs(startRow - destRow);
         int colDiff = Math.abs(startCol - destCol);
 
+        Piece destPiece = destination.getPiece();
+        if (destPiece != null && destPiece.getOwner().equals(this.getOwner())) {
+            return false; // Can't take pieces of the same color
+        }
+
         // Check if the move is a single step in any direction, including level changes.
         if ((levelDiff == 1 && rowDiff == 0 && colDiff == 0) || // Up or down
                 (levelDiff == 0 && rowDiff == 1 && colDiff == 0) || // Vertical
@@ -56,6 +60,12 @@ public class King extends Piece {
         return false;
     }
 
+    /**
+     * Returns a list of all possible moves for the King piece.
+     *
+     * @param board the board on which the piece resides
+     * @return a list of all possible moves for the King piece
+     */
     @Override
     public List<Square> getPossibleMoves(Board board) {
         List<Square> moves = new ArrayList<>();
@@ -63,10 +73,8 @@ public class King extends Piece {
         int startRow = getSquare().getRow();
         int startCol = getSquare().getCol();
 
-        // Offsets for all possible moves of a King
-        int[][] movesOffset = {
-                {0, 1}, {0, -1}, {1, 0}, {-1, 0}, // Horizontal and vertical
-                {1, 1}, {1, -1}, {-1, 1}, {-1, -1}, // Diagonal on the same level
+        // Offsets for moves that involve changing levels
+        int[][] levelChangeMovesOffset = {
                 {0, 0, 1}, {0, 0, -1}, // Up and down a level
                 {1, 0, 1}, {1, 0, -1}, {-1, 0, 1}, {-1, 0, -1}, // Vertical and level
                 {0, 1, 1}, {0, 1, -1}, {0, -1, 1}, {0, -1, -1}, // Horizontal and level
@@ -74,14 +82,14 @@ public class King extends Piece {
                 {-1, 1, 1}, {-1, 1, -1}, {-1, -1, 1}, {-1, -1, -1} // Diagonal and level
         };
 
-        for (int[] move : movesOffset) {
+        for (int[] move : levelChangeMovesOffset) {
             int newRow = startRow + move[0];
-            int newCol = startCol + (move.length > 1 ? move[1] : 0);
-            int newLevel = startLevel + (move.length > 2 ? move[2] : 0);
+            int newCol = startCol + move[1];
+            int newLevel = startLevel + move[2];
 
             if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8 && newLevel >= 0 && newLevel < 3) {
                 Square possibleMove = board.getSquareAt(newLevel, newRow, newCol);
-                if (possibleMove.getPiece() == null || possibleMove.getPiece().getOwner() != this.getOwner()) {
+                if (validMove(possibleMove, board)) {
                     moves.add(possibleMove);
                 }
             }
