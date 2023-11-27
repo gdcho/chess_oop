@@ -36,12 +36,12 @@ public class Queen extends Piece {
             return false; // Can't take pieces of the same color
         }
 
-        // Check if the move is in a straight line (horizontally, vertically, or across levels).
+        // Check if the move is in a straight line
         boolean straightMove = (currentRow == destRow && currentCol == destCol) ||
                 (currentRow == destRow && currentLevel == destLevel) ||
                 (currentCol == destCol && currentLevel == destLevel);
 
-        // Check if the move is diagonally in 2D or 3D (including across levels).
+        // Check if the move is diagonally in 2D or 3D
         boolean diagonalMove = Math.abs(destRow - currentRow) == Math.abs(destCol - currentCol) && currentLevel == destLevel ||
                 Math.abs(destRow - currentRow) == Math.abs(destLevel - currentLevel) && currentCol == destCol ||
                 Math.abs(destCol - currentCol) == Math.abs(destLevel - currentLevel) && currentRow == destRow ||

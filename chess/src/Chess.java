@@ -142,15 +142,12 @@ public class Chess {
         start.setPiece(null);
         // Update the piece's position.
         move.setSquare(end);
-
         // Refresh the UI
         start.repaint();
         end.repaint();
-
         swapCurrentPlayer();
         frame.repaint();
     }
-
 
     /**
      * Switches the current player from white to black, or black to white.

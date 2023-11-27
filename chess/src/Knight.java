@@ -18,8 +18,6 @@ public class Knight extends Piece {
 
     /**
      * Checks if a move to a specified square is valid for the Knight piece.
-     * The Knight moves in an 'L' shape: it can move two squares along a row and one along a column,
-     * or two squares along a column and one along a row. This move can jump over other pieces.
      *
      * @param destination the square to move to
      * @param board       the board on which the move is to be made
@@ -27,17 +25,17 @@ public class Knight extends Piece {
      */
     @Override
     public boolean validMove(Square destination, Board board) {
-        // Get the current position of the Knight, including the level.
+        // Get the current position of the Knight
         int startLevel = this.getSquare().getLevel();
         int startRow = this.getSquare().getRow();
         int startCol = this.getSquare().getCol();
 
-        // Get the position the Knight is trying to move to, including the level.
+        // Get the position the Knight is trying to move to
         int destLevel = destination.getLevel();
         int destRow = destination.getRow();
         int destCol = destination.getCol();
 
-        // Calculate the differences in level, row, and column between the start and destination squares.
+        // Calculate the differences in level, row, and column
         int levelDiff = Math.abs(destLevel - startLevel);
         int rowDiff = Math.abs(startRow - destRow);
         int colDiff = Math.abs(startCol - destCol);

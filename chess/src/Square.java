@@ -63,8 +63,6 @@ public class Square extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g); // super.paintComponent to handle default painting behavior
         Graphics2D g2d = (Graphics2D) g.create();
-
-        // Set rendering hints for quality
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         // Paint the background of the square

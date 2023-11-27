@@ -27,17 +27,17 @@ public class Pawn extends Piece {
      */
     @Override
     public boolean validMove(Square destination, Board board) {
-        // Get the current position of the pawn, including the level.
+        // Get the current position of the pawn
         int startLevel = this.getSquare().getLevel();
         int startRow = this.getSquare().getRow();
         int startCol = this.getSquare().getCol();
 
-        // Get the position the pawn is trying to move to, including the level.
+        // Get the position the pawn is trying to move to
         int destLevel = destination.getLevel();
         int destRow = destination.getRow();
         int destCol = destination.getCol();
 
-        // Determine the direction of movement for the pawn based on its owner.
+        // Determine the direction of movement for the pawn
         int direction = this.getOwner().isWhite() ? -1 : 1;
         int levelDirection = destLevel - startLevel;
 
@@ -112,25 +112,16 @@ public class Pawn extends Piece {
         int startLevel = getSquare().getLevel();
         int startRow = getSquare().getRow();
         int startCol = getSquare().getCol();
-        int direction = this.getOwner().isWhite() ? -1 : 1;
 
-        // Check for moving straight to the top board on the first move
-        if (isFirstMove(startRow)) {
-            int newLevel = this.getOwner().isWhite() ? 2 : 0;
-            int newRow = this.getOwner().isWhite() ? 4 : 3;
-            addMoveIfValid(moves, board, newLevel, newRow, startCol);
-        }
-
-        // Check for diagonal captures that involve changing levels
-        for (int newCol : new int[]{startCol - 1, startCol + 1}) {
-            if (startLevel == 0 || startLevel == 2) { // Allow diagonal capture on moving up or down a level
-                int newLevel = startLevel == 0 ? 1 : 1;
-                addCaptureIfValid(moves, board, newLevel, startRow, newCol);
-            }
+        // Highlight moves only for changing to the next adjacent level
+        if (startLevel == 0 || startLevel == 2) {
+            int newLevel = startLevel == 0 ? 1 : 1; // Move to the middle level
+            addMoveIfValid(moves, board, newLevel, startRow, startCol);
         }
 
         return moves;
     }
+
 
     /**
      * Adds a move to the list of moves if the move is valid.
@@ -146,25 +137,6 @@ public class Pawn extends Piece {
         if (row >= 0 && row < 8 && col >= 0 && col < 8 && level >= 0 && level < 3) {
             Square possibleMove = board.getSquareAt(level, row, col);
             if (possibleMove.getPiece() == null) {
-                moves.add(possibleMove);
-            }
-        }
-    }
-
-    /**
-     * Adds a capture to the list of moves if the capture is valid.
-     *
-     * @param moves the list of moves
-     * @param board the board on which the piece resides
-     * @param level the level of the capture
-     * @param row the row of the capture
-     * @param col the column of the capture
-     * @return true if the capture is valid, false otherwise
-     */
-    private void addCaptureIfValid(List<Square> moves, Board board, int level, int row, int col) {
-        if (row >= 0 && row < 8 && col >= 0 && col < 8 && level >= 0 && level < 3) {
-            Square possibleMove = board.getSquareAt(level, row, col);
-            if (possibleMove.getPiece() != null && possibleMove.getPiece().getOwner() != this.getOwner()) {
                 moves.add(possibleMove);
             }
         }
